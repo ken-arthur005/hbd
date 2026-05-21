@@ -58,7 +58,7 @@ export default function HeroVideo() {
   }, []);
 
   return (
-    <div className="absolute z-0" style={{ top: 300, right: 0, bottom: 0, left: 0 }}>
+    <div className="absolute z-0 overflow-hidden" style={{ top: 300, right: 0, bottom: 0, left: 0 }}>
       <video
         ref={videoRef}
         src="/hero.mp4"

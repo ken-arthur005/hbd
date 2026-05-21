@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const links = [
   { label: 'things Annie would say', href: '#things-annie-would-say' },
@@ -11,6 +11,29 @@ const links = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
+
+  useEffect(() => {
+    const sectionIds = links.map((l) => l.href.slice(1));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          setActiveSection('#' + visible[0].target.id);
+        }
+      },
+      { rootMargin: '-20% 0px -70% 0px' }
+    );
+
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <nav className="relative z-10 w-full px-6 py-6" style={{ fontFamily: 'var(--font-inter)' }}>
@@ -21,9 +44,12 @@ export default function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-[#6F6F6F] hover:text-black transition-colors duration-300"
+              className="relative text-sm text-[#6F6F6F] hover:text-black transition-colors duration-300"
             >
               {link.label}
+              {activeSection === link.href && (
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-black" />
+              )}
             </a>
           ))}
         </div>
@@ -64,9 +90,12 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="text-sm text-[#6F6F6F] hover:text-black transition-colors duration-300"
+              className="relative text-sm text-[#6F6F6F] hover:text-black transition-colors duration-300"
             >
               {link.label}
+              {activeSection === link.href && (
+                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-black" />
+              )}
             </a>
           ))}
         </div>
