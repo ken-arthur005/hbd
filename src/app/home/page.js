@@ -8,22 +8,26 @@ import MomentsAndPhrases from '@/components/MomentsAndPhrases';
 import DidYouKnowQuiz from '@/components/DidYouKnowQuiz';
 import TourEnd from '@/components/TourEnd';
 import LetterToAnnie from '@/components/LetterToAnnie';
+import { QuizProvider } from '@/context/QuizContext';
 
 export default function HomePage() {
   return (
-    <div className="snap-container">
-      <HeroWrapper>
-        <Navbar />
-        <HeroContent />
-        <HeroVideo />
-      </HeroWrapper>
+    <QuizProvider>
+      <div className="snap-container">
+        <HeroWrapper>
+          <Navbar />
+          <HeroContent />
+          <HeroVideo />
+        </HeroWrapper>
 
-      <WhoIsAnnie />
-      <TwentyFiveThings />
-      <MomentsAndPhrases />
-      <DidYouKnowQuiz />
-      <TourEnd />
+        <WhoIsAnnie />
+        <TwentyFiveThings />
+        <MomentsAndPhrases />
+        <DidYouKnowQuiz />
+        <TourEnd />
+      </div>
+
       <LetterToAnnie />
-    </div>
+    </QuizProvider>
   );
 }

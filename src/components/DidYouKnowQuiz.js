@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import gsap from 'gsap';
+import { useQuiz } from '@/context/QuizContext';
 
 const FULL_TITLE = 'Annie Birthday Special Interactive Quiz';
 const CAPTION = 'answer all questions correctly for a surprise';
@@ -70,6 +71,8 @@ export default function DidYouKnowQuiz() {
   const [feedbackState, setFeedbackState] = useState(null); // null | 'correct' | 'wrong'
   const [selectedAnswer, setSelectedAnswer] = useState(null); // index of clicked answer
 
+  const { quizCompleted, initialized, completeQuiz, resetQuiz, openLetter } = useQuiz();
+
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
   const typingTriggered = useRef(false);
@@ -86,6 +89,15 @@ export default function DidYouKnowQuiz() {
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
   }, []);
+
+  // Preload letter assets when quiz starts playing
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    const img1 = new Image();
+    img1.src = '/letter.png';
+    const img2 = new Image();
+    img2.src = '/envelope_open.png';
+  }, [phase]);
 
   // Typing animation — triggered once when section enters viewport
   useEffect(() => {
@@ -191,7 +203,24 @@ export default function DidYouKnowQuiz() {
     document.getElementById('tour-end')?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  // Handle all-correct completion transition
+  // Handle retake from completed summary card
+  const handleQuizReset = useCallback(() => {
+    resetQuiz();
+    setCurrentQuestion(0);
+    setAnswersCorrect(0);
+    setPhase('idle');
+    setFeedbackState(null);
+    setSelectedAnswer(null);
+    setIsAnimating(false);
+    setDisplayedTitle('');
+    typingTriggered.current = false;
+    // Reset opacity in case it was faded out
+    if (sectionRef.current) {
+      gsap.set(sectionRef.current, { opacity: 1 });
+    }
+  }, [resetQuiz]);
+
+  // Handle all-correct completion — save to localStorage and open letter
   useEffect(() => {
     if (phase !== 'complete' || !sectionRef.current) return;
 
@@ -201,11 +230,16 @@ export default function DidYouKnowQuiz() {
         duration: 0.8,
         ease: 'power2.inOut',
         onComplete: () => {
-          document.getElementById('letter-to-annie')?.scrollIntoView({ behavior: 'smooth' });
+          // Save completion to localStorage
+          completeQuiz();
+          // Open letter overlay after brief delay
+          gsap.delayedCall(0.3, () => {
+            openLetter();
+          });
         },
       });
     });
-  }, [phase]);
+  }, [phase, completeQuiz, openLetter]);
 
   const isTyping = !typingDone && displayedTitle.length < FULL_TITLE.length;
   const question = QUESTIONS[currentQuestion];
@@ -303,8 +337,37 @@ export default function DidYouKnowQuiz() {
             </span>
           </div>
 
+          {/* ===== COMPLETED SUMMARY — shown when returning after completion ===== */}
+          {quizCompleted && initialized && (
+            <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-6">
+              <h3
+                className="text-2xl sm:text-3xl md:text-4xl text-[#2C2420] text-center mb-8"
+                style={{ fontFamily: 'var(--font-instrument-serif)' }}
+              >
+                You know Annie well{' '}
+                <span className="inline-block">:)</span>
+              </h3>
+              <div className="flex flex-col gap-3 w-full max-w-xs">
+                <button
+                  onClick={openLetter}
+                  className="w-full py-3.5 rounded-full bg-black text-white text-base font-medium tracking-wide hover:bg-black/80 transition-colors duration-200 cursor-pointer"
+                  style={{ fontFamily: 'var(--font-inter)' }}
+                >
+                  View the Letter
+                </button>
+                <button
+                  onClick={handleQuizReset}
+                  className="w-full py-3.5 rounded-full border-2 border-[#E8DCC8] text-[#5C4E3E] text-base font-medium tracking-wide hover:bg-[#FAF6F0] transition-colors duration-200 cursor-pointer"
+                  style={{ fontFamily: 'var(--font-inter)' }}
+                >
+                  Retake Quiz
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* ===== WELCOME STATE ===== */}
-          {phase === 'idle' && (
+          {!quizCompleted && phase === 'idle' && (
             <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-6 sm:px-10">
               {/* Mobile-only header + caption */}
               {isMobile && (
@@ -343,7 +406,7 @@ export default function DidYouKnowQuiz() {
           )}
 
           {/* ===== PLAYING STATE ===== */}
-          {phase === 'playing' && (
+          {!quizCompleted && phase === 'playing' && (
             <div
               ref={contentRef}
               className="relative z-10 flex flex-col w-full h-full px-6 sm:px-10 py-8 sm:py-12"
@@ -394,7 +457,7 @@ export default function DidYouKnowQuiz() {
           )}
 
           {/* ===== COMPLETE STATE ===== */}
-          {phase === 'complete' && (
+          {!quizCompleted && phase === 'complete' && (
             <div className="relative z-10 flex flex-col items-center justify-center w-full h-full px-6">
               <h3
                 className="text-3xl sm:text-4xl text-[#2C2420] text-center"
