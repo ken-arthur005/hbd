@@ -1,19 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-const links = [
-  { label: 'Moments and Phrases', href: '#moments-and-phrases' },
-  { label: '12 things I love about Annie', href: '#twenty-five-things' },
-  { label: 'Did you know', href: '#did-you-know-quiz' },
-];
+import { NAV_LINKS } from '@/lib/navLinks';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
-    const sectionIds = links.map((l) => l.href.slice(1));
+    const sectionIds = NAV_LINKS.map((l) => l.href.slice(1));
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -39,7 +34,7 @@ export default function Navbar() {
       <div className="mx-auto flex items-center justify-end">
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-8">
-          {links.map((link) => (
+          {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -84,7 +79,7 @@ export default function Navbar() {
         }`}
       >
         <div className="flex flex-col items-end gap-4 pt-4 pr-2">
-          {links.map((link) => (
+          {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}

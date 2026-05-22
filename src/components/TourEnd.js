@@ -1,22 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import BoomerangVideoBg from './BoomerangVideoBg';
-
-const NAV_LINKS = [
-  { label: 'Hero', href: '#hero' },
-  { label: 'Who is Annie', href: '#who-is-annie' },
-  { label: '12 Things', href: '#twenty-five-things' },
-  { label: 'Moments & Phrases', href: '#moments-and-phrases' },
-  { label: 'Did You Know', href: '#did-you-know-quiz' },
-];
+import { NAV_LINKS } from '@/lib/navLinks';
 
 export default function TourEnd() {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   const handleReplay = () => {
     document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleNav = (href) => {
+    setMobileNavOpen(false);
     const id = href.replace('#', '');
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -76,17 +73,61 @@ export default function TourEnd() {
         </button>
       </div>
 
-      {/* Bottom-right: Nav pills — desktop only */}
-      <div className="absolute z-20 bottom-6 right-6 hidden sm:block">
+      {/* Bottom-right: Nav — pills on desktop, hamburger on mobile */}
+      <div className="absolute z-20 bottom-6 right-6">
+        {/* Desktop nav pills */}
+        <div className="hidden sm:flex items-center gap-1 bg-white/70 backdrop-blur-md rounded-full pl-4 pr-1 py-1 shadow-sm border border-white/60">
+          {NAV_LINKS.map((link) => (
+            <button
+              key={link.href}
+              onClick={() => handleNav(link.href)}
+              className="px-3 py-1.5 text-xs text-[#1f2a1d] hover:text-[#85AB8B] transition-colors duration-200 cursor-pointer whitespace-nowrap"
+              style={{ fontFamily: 'var(--font-inter)' }}
+            >
+              {link.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          className="sm:hidden flex flex-col gap-1.5 p-2"
+          aria-label="Toggle navigation menu"
+        >
+          <span
+            className={`block h-px w-5 bg-white transition-all duration-300 ${
+              mobileNavOpen ? 'translate-y-1.5' : ''
+            }`}
+          />
+          <span
+            className={`block h-px w-5 bg-white transition-all duration-300 ${
+              mobileNavOpen ? 'opacity-0' : ''
+            }`}
+          />
+          <span
+            className={`block h-px w-5 bg-white transition-all duration-300 ${
+              mobileNavOpen ? '-translate-y-1.5' : ''
+            }`}
+          />
+        </button>
+      </div>
+
+      {/* Mobile dropdown */}
+      <div
+        className={`sm:hidden absolute z-30 bottom-20 right-6 overflow-hidden transition-all duration-400 ease-in-out ${
+          mobileNavOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
         <div
-          className="flex items-center gap-1 bg-white/70 backdrop-blur-md rounded-full pl-4 pr-1 py-1 shadow-sm border border-white/60"
+          className="flex flex-col items-end gap-2 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-white/60"
           style={{ fontFamily: 'var(--font-inter)' }}
         >
           {NAV_LINKS.map((link) => (
             <button
               key={link.href}
               onClick={() => handleNav(link.href)}
-              className="px-3 py-1.5 text-xs text-[#1f2a1d] hover:text-[#85AB8B] transition-colors duration-200 cursor-pointer whitespace-nowrap"
+              className="px-4 py-2 text-xs text-[#1f2a1d] hover:text-[#85AB8B] transition-colors duration-200 cursor-pointer whitespace-nowrap text-right w-full"
             >
               {link.label}
             </button>

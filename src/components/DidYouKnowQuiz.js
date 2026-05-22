@@ -128,6 +128,26 @@ export default function DidYouKnowQuiz() {
     return () => observer.disconnect();
   }, []);
 
+  // Opacity restoration — fires every time the section re-enters viewport
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        if (quizCompleted) {
+          gsap.set(sectionRef.current, { opacity: 1 });
+          setPhase('idle');
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [quizCompleted]);
+
   // Animate progress bar width when answersCorrect changes
   useEffect(() => {
     if (progressRef.current) {
