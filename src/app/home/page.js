@@ -5,6 +5,9 @@ import HeroWrapper from '@/components/HeroWrapper';
 import WhoIsAnnie from '@/components/WhoIsAnnie';
 import TwentyFiveThings from '@/components/TwentyFiveThings';
 import MomentsAndPhrases from '@/components/MomentsAndPhrases';
+import DidYouKnowQuiz from '@/components/DidYouKnowQuiz';
+import TourEnd from '@/components/TourEnd';
+import LetterToAnnie from '@/components/LetterToAnnie';
 
 export default function HomePage() {
   return (
@@ -18,6 +21,9 @@ export default function HomePage() {
       <WhoIsAnnie />
       <TwentyFiveThings />
       <MomentsAndPhrases />
+      <DidYouKnowQuiz />
+      <TourEnd />
+      <LetterToAnnie />
     </div>
   );
 }
