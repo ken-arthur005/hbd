@@ -31,6 +31,7 @@ export default function HeroWrapper({ children }) {
   return (
     <section
       ref={heroRef}
+      id="hero"
       className="relative snap-section w-full bg-white"
       style={{ willChange: 'opacity' }}
     >
