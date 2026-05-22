@@ -31,7 +31,7 @@ body {
 }
 
 .snap-container {
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   overflow-y: scroll;
   height: 100vh;
   scroll-behavior: smooth;
@@ -42,4 +42,9 @@ body {
   scroll-snap-stop: always;
   height: 100vh;
   overflow: hidden;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
 }

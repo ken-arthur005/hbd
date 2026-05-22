@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react';
 
 const links = [
-  { label: 'things Annie would say', href: '#things-annie-would-say' },
+  { label: 'Moments and Phrases', href: '#moments-and-phrases' },
   { label: '25 things I love about Annie', href: '#twenty-five-things' },
-  { label: "Moments I'll never forget", href: '#moments' },
   { label: 'Did you know', href: '#did-you-know' },
 ];
 

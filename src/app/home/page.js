@@ -4,6 +4,7 @@ import HeroContent from '@/components/HeroContent';
 import HeroWrapper from '@/components/HeroWrapper';
 import WhoIsAnnie from '@/components/WhoIsAnnie';
 import TwentyFiveThings from '@/components/TwentyFiveThings';
+import MomentsAndPhrases from '@/components/MomentsAndPhrases';
 
 export default function HomePage() {
   return (
@@ -16,6 +17,7 @@ export default function HomePage() {
 
       <WhoIsAnnie />
       <TwentyFiveThings />
+      <MomentsAndPhrases />
     </div>
   );
 }

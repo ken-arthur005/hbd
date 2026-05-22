@@ -18,24 +18,7 @@ The reveal moment is emotionally important.
 
 ---
 
-## Section 2 — Things Annie Says
-
-Purpose:
-Build familiarity, humor, and emotional recognition.
-
-Structure ideas:
-- floating quote cards
-- drifting dialogue fragments
-- observational commentary
-
-Tone:
-- playful
-- intelligent
-- affectionate
-
----
-
-## Section 3 — 50 Things I Love About Annie
+## Section 2 — 25 Things I Love About Annie
 
 Purpose:
 Main emotional appreciation section.
@@ -52,24 +35,30 @@ Avoid repetitive compliment structures.
 
 ---
 
-## Section 4 — Moments I'll Never Forget
+## Section 3 — Moments and Phrases
 
 Purpose:
-Nostalgia and emotional memory.
+Combine humor, nostalgia, and emotional recognition through memorable moments and iconic phrases.
 
-Structure ideas:
-- floating polaroids
-- cinematic memory cards
-- layered image storytelling
+Structure:
+- Card stacking effect with 3 sticky cards
+- Left column: tall image; Right column: descriptive text
+- GSAP-powered scale-down as cards scroll past
+
+Cards:
+1. "When she collected extra sheet during calculus" — playful calculus exam moment
+2. "She showed up" — heartland rescue story
+3. "Impudence of twerking maggotas" — signature phrase
 
 Tone:
+- playful
+- nostalgic
 - intimate
-- reflective
-- warm
+- affectionate humor
 
 ---
 
-## Section 5 — Did You Know?
+## Section 4 — Did You Know?
 
 Purpose:
 Humor and emotional relief.
@@ -90,7 +79,7 @@ Potential Michael Jackson reference:
 
 ---
 
-## Section 6 — Letter To Annie
+## Section 5 — Letter To Annie
 
 Purpose:
 Final emotional conclusion.
