@@ -3,10 +3,11 @@ import HeroVideo from '@/components/HeroVideo';
 import HeroContent from '@/components/HeroContent';
 import HeroWrapper from '@/components/HeroWrapper';
 import WhoIsAnnie from '@/components/WhoIsAnnie';
+import TwentyFiveThings from '@/components/TwentyFiveThings';
 
 export default function HomePage() {
   return (
-    <>
+    <div className="snap-container">
       <HeroWrapper>
         <Navbar />
         <HeroContent />
@@ -14,6 +15,7 @@ export default function HomePage() {
       </HeroWrapper>
 
       <WhoIsAnnie />
-    </>
+      <TwentyFiveThings />
+    </div>
   );
 }

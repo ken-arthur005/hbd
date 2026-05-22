@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import gsap from 'gsap';
 
 const IMAGES = [
   { src: '/annietoon11.png', bg: '#F4845F', panel: '#F79B7F' },
@@ -38,6 +39,10 @@ export default function WhoIsAnnie() {
   const [isMobile, setIsMobile] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
   const sectionRef = useRef(null);
+  const ghostRef = useRef(null);
+  const bottomRef = useRef(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 640);
@@ -46,10 +51,11 @@ export default function WhoIsAnnie() {
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  // IntersectionObserver for entrance animation
+  // IntersectionObserver entrance trigger
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -59,9 +65,40 @@ export default function WhoIsAnnie() {
       },
       { threshold: 0.15 }
     );
+
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
+
+  // Set initial hidden state for entrance animation elements
+  useEffect(() => {
+    gsap.set(ghostRef.current, { opacity: 0, scale: 0.85 });
+    gsap.set(bottomRef.current, { opacity: 0, y: 16 });
+  }, []);
+
+  // GSAP entrance timeline (triggered when section enters viewport)
+  useEffect(() => {
+    if (!hasEntered) return;
+
+    const ghost = ghostRef.current;
+    const bottom = bottomRef.current;
+    if (!ghost || !bottom) return;
+
+    const tl = gsap.timeline();
+
+    tl.fromTo(
+      ghost,
+      { opacity: 0, scale: 0.85 },
+      { opacity: 1, scale: 1, duration: 1, ease: 'power2.out' }
+    ).fromTo(
+      bottom,
+      { opacity: 0, y: 16 },
+      { opacity: 1, y: 0, duration: 0.9, ease: 'power2.out' },
+      0.15
+    );
+
+    return () => tl.kill();
+  }, [hasEntered]);
 
   // Preload images
   useEffect(() => {
@@ -83,6 +120,21 @@ export default function WhoIsAnnie() {
     [isAnimating]
   );
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e) => {
+    if (isAnimating) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) navigate('next');
+      else navigate('prev');
+    }
+  };
+
   const roles = {
     center: activeIndex,
     left: (activeIndex + 3) % 4,
@@ -103,13 +155,13 @@ export default function WhoIsAnnie() {
     switch (role) {
       case 'center':
         return {
-          transform: `translateX(-50%) scale(${isMobile ? 1.25 : 1.68})`,
+          transform: `translateX(-50%) scale(${isMobile ? 1.1 : 1.2})`,
           filter: 'blur(0px)',
           opacity: 1,
           zIndex: 20,
           left: '50%',
-          height: isMobile ? '60%' : '92%',
-          bottom: isMobile ? '22%' : 0,
+          height: isMobile ? '55%' : '70%',
+          bottom: isMobile ? '18%' : 0,
           transition,
         };
       case 'left':
@@ -119,8 +171,8 @@ export default function WhoIsAnnie() {
           opacity: 0.85,
           zIndex: 10,
           left: isMobile ? '20%' : '30%',
-          height: isMobile ? '16%' : '28%',
-          bottom: isMobile ? '32%' : '12%',
+          height: isMobile ? '13%' : '22%',
+          bottom: isMobile ? '28%' : '10%',
           transition,
         };
       case 'right':
@@ -130,8 +182,8 @@ export default function WhoIsAnnie() {
           opacity: 0.85,
           zIndex: 10,
           left: isMobile ? '80%' : '70%',
-          height: isMobile ? '16%' : '28%',
-          bottom: isMobile ? '32%' : '12%',
+          height: isMobile ? '13%' : '22%',
+          bottom: isMobile ? '28%' : '10%',
           transition,
         };
       case 'back':
@@ -141,8 +193,8 @@ export default function WhoIsAnnie() {
           opacity: 1,
           zIndex: 5,
           left: '50%',
-          height: isMobile ? '13%' : '22%',
-          bottom: isMobile ? '32%' : '12%',
+          height: isMobile ? '10%' : '18%',
+          bottom: isMobile ? '28%' : '10%',
           transition,
         };
       default:
@@ -156,7 +208,7 @@ export default function WhoIsAnnie() {
     <section
       ref={sectionRef}
       id="who-is-annie"
-      className="relative w-full overflow-hidden"
+      className="relative snap-section w-full overflow-hidden"
       style={{
         backgroundColor: IMAGES[activeIndex].bg,
         transition: 'background-color 650ms cubic-bezier(0.4,0,0.2,1)',
@@ -185,28 +237,31 @@ export default function WhoIsAnnie() {
 
         {/* Giant ghost text */}
         <div
+          ref={ghostRef}
           className="absolute inset-x-0 flex items-center justify-center pointer-events-none select-none"
           style={{
             zIndex: 2,
-            top: '18%',
+            top: isMobile ? '12%' : '18%',
             fontFamily: 'var(--font-anton)',
-            fontSize: 'clamp(90px, 28vw, 380px)',
+            fontSize: isMobile ? 'clamp(20px, 5vw, 32px)' : 'clamp(90px, 28vw, 380px)',
             fontWeight: 900,
             color: 'white',
             lineHeight: 1,
             textTransform: 'uppercase',
             letterSpacing: '-0.02em',
             whiteSpace: 'nowrap',
-            opacity: hasEntered ? 1 : 0,
-            transform: hasEntered ? 'scale(1)' : 'scale(0.85)',
-            transition: 'opacity 1s cubic-bezier(0.4,0,0.2,1), transform 1s cubic-bezier(0.4,0,0.2,1)',
           }}
         >
           WHO IS ANNIE
         </div>
 
         {/* Carousel */}
-        <div className="absolute inset-0" style={{ zIndex: 3 }}>
+        <div
+          className="absolute inset-0"
+          style={{ zIndex: 3 }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           {IMAGES.map((image, index) => {
             const role = getRole(index);
             const style = getRoleStyle(role);
@@ -238,13 +293,11 @@ export default function WhoIsAnnie() {
 
         {/* Bottom-left text + nav buttons */}
         <div
-          className="absolute bottom-6 left-4 sm:bottom-20 sm:left-24"
+          ref={bottomRef}
+          className="absolute bottom-24 left-4 sm:bottom-20 sm:left-24"
           style={{
             zIndex: 60,
             maxWidth: 320,
-            opacity: hasEntered ? 1 : 0,
-            transform: hasEntered ? 'translateY(0)' : 'translateY(16px)',
-            transition: 'opacity 0.9s cubic-bezier(0.4,0,0.2,1) 0.15s, transform 0.9s cubic-bezier(0.4,0,0.2,1) 0.15s',
           }}
         >
           <p
