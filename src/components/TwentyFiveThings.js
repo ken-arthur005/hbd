@@ -1,16 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X } from 'lucide-react';
 import gsap from 'gsap';
+import annieTraitsData from './annieTraits.json';
+import BoomerangVideoBg from './BoomerangVideoBg';
 
-const FULL_TITLE = '25 things I love about Annie';
-
-const PLACEHOLDER_ITEMS = Array.from({ length: 25 }, (_, i) => ({
-  id: i,
-  label: `Thing #${i + 1}`,
-  text: `This is placeholder thing #${i + 1} about Annie — actual content coming soon.`,
-}));
+const TRAITS = annieTraitsData.traits;
+const FULL_TITLE = '12 things I love about Annie';
 
 export default function TwentyFiveThings() {
   const [phase, setPhase] = useState('idle');
@@ -18,8 +15,6 @@ export default function TwentyFiveThings() {
   const [titleFadingOut, setTitleFadingOut] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeCardIndex, setActiveCardIndex] = useState(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const sectionRef = useRef(null);
   const titleRef = useRef(null);
@@ -29,19 +24,9 @@ export default function TwentyFiveThings() {
   const cardTween = useRef(null);
   const triggeredRef = useRef(false);
 
-  // Mobile detection + dynamic itemsPerPage
+  // Mobile detection — simple, no pagination calc
   useEffect(() => {
-    const check = () => {
-      const mobile = window.innerWidth < 640;
-      setIsMobile(mobile);
-      if (mobile) {
-        const cellSize = window.innerWidth / 4;
-        const rowsThatFit = Math.max(2, Math.floor((window.innerHeight * 0.85) / cellSize));
-        setItemsPerPage(Math.min(rowsThatFit * 4, 25));
-      } else {
-        setItemsPerPage(10);
-      }
-    };
+    const check = () => setIsMobile(window.innerWidth < 640);
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
@@ -111,7 +96,7 @@ export default function TwentyFiveThings() {
     // Lock body scroll
     document.body.style.overflow = 'hidden';
 
-    // We need to wait for the card DOM to render. Use rAF.
+    // Wait for the card DOM to render
     requestAnimationFrame(() => {
       const card = cardRef.current;
       if (!card) return;
@@ -187,40 +172,25 @@ export default function TwentyFiveThings() {
     };
   }, []);
 
-  // Clamp currentPage when itemsPerPage shrinks (e.g. on resize)
-  useEffect(() => {
-    const newTotalPages = Math.ceil(PLACEHOLDER_ITEMS.length / itemsPerPage);
-    if (currentPage >= newTotalPages) {
-      setCurrentPage(0);
-    }
-  }, [itemsPerPage]);
-
-  const columns = isMobile ? 4 : 5;
-  const totalPages = Math.ceil(PLACEHOLDER_ITEMS.length / itemsPerPage);
-  const paginatedItems = PLACEHOLDER_ITEMS.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
-  const itemsToRender = isMobile ? paginatedItems : PLACEHOLDER_ITEMS;
-
-  const goToPage = (page) => {
-    if (activeCardIndex !== null) closeCard();
-    setCurrentPage(page);
-  };
-  const activeItem = activeCardIndex !== null ? PLACEHOLDER_ITEMS[activeCardIndex] : null;
+  const columns = isMobile ? 3 : 4;
+  const activeItem = activeCardIndex !== null ? TRAITS[activeCardIndex] : null;
 
   return (
     <section
       ref={sectionRef}
       id="twenty-five-things"
-      className="relative snap-section w-full bg-white"
+      className="relative snap-section w-full overflow-hidden"
       style={{ fontFamily: 'var(--font-inter)' }}
     >
+      {/* Boomerang video background */}
+      <BoomerangVideoBg src="/flowersblooming.mp4" className="absolute inset-0 w-full h-full" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40 pointer-events-none" />
+
       {/* Typing title overlay */}
       {showTitle && (
         <div
           ref={titleRef}
-          className="absolute inset-0 z-20 flex items-center justify-center bg-white"
+          className="absolute inset-0 z-20 flex items-center justify-center bg-white/90 backdrop-blur-sm"
         >
           <h2
             className="text-3xl sm:text-5xl md:text-6xl text-center px-6 max-w-3xl text-black"
@@ -240,12 +210,12 @@ export default function TwentyFiveThings() {
         </div>
       )}
 
-      {/* Grid area + pagination — hidden during typing, shows during grid phase */}
+      {/* Grid area — hidden during typing, shows during grid phase */}
       <div
         className="flex flex-col h-full w-full"
         style={{
-          opacity: phase === 'grid' || phase === 'card-open' ? 1 : 0,
-          pointerEvents: phase === 'grid' || phase === 'card-open' ? 'auto' : 'none',
+          opacity: phase === 'grid' ? 1 : 0,
+          pointerEvents: phase === 'grid' ? 'auto' : 'none',
         }}
       >
         {/* Grid */}
@@ -254,63 +224,29 @@ export default function TwentyFiveThings() {
           className="flex-1 flex items-center justify-center"
         >
           <div
+            className="bg-white/5 backdrop-blur-md p-3 sm:p-4 rounded-2xl"
             style={{
               display: 'grid',
               gridTemplateColumns: `repeat(${columns}, 1fr)`,
-              width: isMobile ? '100%' : 'min(100vh, 900px)',
+              width: isMobile ? '100%' : 'min(65vh, 600px)',
               maxWidth: '100%',
+              gap: '1px',
             }}
           >
-            {itemsToRender.map((item, i) => {
-              const gridIndex = isMobile ? currentPage * itemsPerPage + i : i;
-              return (
-                <div
-                  key={item.id}
-                  ref={(el) => { boxRefs.current[gridIndex] = el; }}
-                  className="flex items-center justify-center cursor-pointer select-none"
-                  style={{
-                    aspectRatio: '1',
-                    backgroundColor: 'white',
-                    border: '1px solid #bfdbfe',
-                    transition: 'background-color 250ms cubic-bezier(0.4,0,0.2,1)',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#dbeafe'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'white'; }}
-                  onClick={() => openCard(gridIndex)}
-                >
-                  <span className="text-xs text-gray-400">{item.label}</span>
-                </div>
-              );
-            })}
+            {TRAITS.map((item, i) => (
+              <div
+                key={item.id}
+                ref={(el) => { boxRefs.current[i] = el; }}
+                className="flex items-center justify-center cursor-pointer select-none aspect-square bg-white/10 backdrop-blur-sm border border-white/15 hover:bg-white/20 transition-all duration-300"
+                onClick={() => openCard(i)}
+              >
+                <span className="text-lg sm:text-2xl font-medium text-white/80">
+                  {item.id}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-
-        {/* Pagination controls — mobile only */}
-        {isMobile && totalPages > 1 && (
-        <div className="flex-shrink-0 flex items-center justify-center gap-4 py-4 pb-6">
-          <button
-            onClick={() => goToPage(Math.max(0, currentPage - 1))}
-            disabled={currentPage === 0 || activeCardIndex !== null}
-            className="w-10 h-10 rounded-full flex items-center justify-center border border-blue-200 text-gray-500 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
-            aria-label="Previous page"
-          >
-            <ChevronLeft size={20} strokeWidth={2} />
-          </button>
-
-          <span className="text-sm text-gray-400 font-mono">
-            {currentPage + 1} / {totalPages}
-          </span>
-
-          <button
-            onClick={() => goToPage(Math.min(totalPages - 1, currentPage + 1))}
-            disabled={currentPage === totalPages - 1 || activeCardIndex !== null}
-            className="w-10 h-10 rounded-full flex items-center justify-center border border-blue-200 text-gray-500 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
-            aria-label="Next page"
-          >
-            <ChevronRight size={20} strokeWidth={2} />
-          </button>
-        </div>
-        )}
       </div>
 
       {/* Card overlay */}
@@ -325,27 +261,40 @@ export default function TwentyFiveThings() {
           {/* Card */}
           <div
             ref={cardRef}
-            className="absolute z-50 flex flex-col items-center justify-center bg-white shadow-2xl overflow-hidden"
+            className="absolute z-50 flex flex-col items-center justify-center shadow-2xl overflow-hidden"
           >
             {/* Close button */}
             <button
               onClick={closeCard}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors duration-200 cursor-pointer"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 text-white transition-colors duration-200 cursor-pointer z-20"
               aria-label="Close"
             >
               <X size={20} strokeWidth={2} />
             </button>
 
-            {/* Card content */}
-            <div className="flex flex-col items-center justify-center text-center px-8 sm:px-16 max-w-2xl">
-              <span className="text-sm text-blue-500 mb-4 tracking-widest uppercase">
-                {activeItem.label}
+            {/* Background image */}
+            <div className="absolute inset-0">
+              <img
+                src={activeItem.image}
+                alt={activeItem.trait}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+            </div>
+
+            {/* Text content */}
+            <div className="relative z-10 flex flex-col justify-end w-full h-full p-6 sm:p-8">
+              <span className="text-white/60 text-sm mb-2 tracking-widest uppercase">
+                {String(activeItem.id).padStart(2, '0')}
               </span>
-              <p
-                className="text-xl sm:text-3xl md:text-4xl text-black leading-relaxed"
+              <h3
+                className="text-white text-xl sm:text-2xl md:text-3xl mb-3 leading-tight"
                 style={{ fontFamily: 'var(--font-instrument-serif)' }}
               >
-                {activeItem.text}
+                {activeItem.trait}
+              </h3>
+              <p className="text-white/80 text-sm sm:text-base leading-relaxed max-w-lg">
+                {activeItem.description}
               </p>
             </div>
           </div>

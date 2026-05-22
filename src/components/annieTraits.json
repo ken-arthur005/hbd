@@ -1,0 +1,77 @@
+{
+    "traits": [
+        {
+            "id": 1,
+            "trait": "desire to help others",
+            "description": "Annie has a strong desire to help others and make a positive impact on the world.", 
+            "image": "/annie1.png"
+        },
+        {
+            "id": 2,
+            "trait": "her accent",
+            "description": "seriously, you should hear that girl talk, it's like music to your ears - well sometimes. other times it's like a dying fish",
+            "image": "/annie2.png"
+        },
+        {
+            "id": 3,
+            "trait": "her love for animals",
+            "description": "She's obsessed with animals.", 
+            "image": "/annie3.png"
+        },
+        {
+            "id": 4,
+            "trait": "her intelligence",
+            "description": "that girl is a walking calculator, she can solve any problem you throw at her. never forgiving her for that calculus exam",
+            "image": "/annie4.png"
+        },
+        {
+            "id": 5,
+            "trait": "her hugs",
+            "description": "Annie's hugs are the best in the world.",
+            "image": "/annie5.png"
+        },
+        {
+            "id": 6,
+            "trait": "how she thinks",
+            "description": "just talk to her for 5 minutes, you'll see what i mean",
+            "image": "/annie6.png"
+        },
+        {
+            "id": 7,
+            "trait": "her selflessness",
+            "description": "Annie always puts others before herself, she's the most selfless person I know.",
+            "image": "/annie7.png"
+        },
+        {
+            "id": 8,
+            "trait": "her leaf collection",
+            "description": "yes, a leaf collection and it's fucking cute and actually pretty impressive",
+            "image": "/annie8.png"
+        },
+        {
+            "id": 9,
+            "trait": "she's a cat lover",
+            "description": "what can i say, she loves them felines",
+            "image": "/annie9.png"
+        },
+        {
+            "id": 10,
+            "trait": "her reaction around bugs",
+            "description": "yes you read that right, bugs. if you ever see her around a bug, you'll know what i mean",
+            "image": "/annie10.png"
+        },
+        {
+            "id": 11,
+            "trait": "her smile",
+            "description": "Annie has a great smile that can light up the darkest room.",
+            "image": "/annie11.png"
+        },
+        {
+            "id": 12,
+            "trait": "her love for nature",
+            "description": "Annie has a deep connection with nature and loves spending time outdoors.",
+            "image": "/annie12.png"
+        }
+
+    ]
+}
